@@ -20,6 +20,7 @@ from openprocurement.api.models import (
     LotValue, Bid, Revision, Question,  Cancellation, Contract, Award, Feature,
     Lot, schematics_embedded_role, schematics_default_role, ORA_CODES, WORKING_DAYS,
     validate_features_uniq, validate_items_uniq, validate_lots_uniq, Period,
+    validate_cpv_group,
     Complaint as BaseComplaint, TZ, get_now, set_parent, ComplaintModelType,
 )
 from openprocurement.auctions.core.models import IAuction, get_auction
@@ -40,13 +41,6 @@ def read_json(name):
         data = lang_file.read()
     return loads(data)
 
-
-CAV_CODES = read_json('cav.json')
-
-
-class CAVClassification(Classification):
-    scheme = StringType(required=True, default=u'CAV', choices=[u'CAV'])
-    id = StringType(required=True, choices=CAV_CODES)
 
 
 class Guarantee(Model):
@@ -140,7 +134,6 @@ class Location(Model):
 
 class Item(Item):
     """A good, service, or work to be contracted."""
-    classification = ModelType(CAVClassification, required=True)
     additionalClassifications = ListType(ModelType(Classification), default=list(), validators=[validate_dkpp]) # required=True, min_size=1,
 
 
@@ -439,10 +432,6 @@ class Lot(Lot):
                 raise ValidationError(u"value should be less than value of lot")
     auctionPeriod = ModelType(LotAuctionPeriod, default={})
 
-def validate_cav_group(items, *args):
-    if items and len(set([i.classification.id[:3] for i in items])) != 1:
-        raise ValidationError(u"CAV group of items be identical")
-
 
 plain_role = (blacklist('_attachments', 'revisions', 'dateModified') + schematics_embedded_role)
 create_role = (blacklist('owner_token', 'owner', '_attachments', 'revisions', 'date', 'dateModified', 'doc_id', 'auctionID', 'bids', 'documents', 'awards', 'questions', 'complaints', 'auctionUrl', 'status', 'auctionPeriod', 'awardPeriod', 'procurementMethod', 'awardCriteria', 'submissionMethod', 'cancellations', 'numberOfBidders', 'contracts') + schematics_embedded_role)
@@ -513,7 +502,7 @@ class Auction(SchematicsDocument, Model):
     description_ru = StringType()
     date = IsoDateTimeType()
     auctionID = StringType()  # AuctionID should always be the same as the OCID. It is included to make the flattened data structure more convenient.
-    items = ListType(ModelType(Item), required=True, min_size=1, validators=[validate_cav_group, validate_items_uniq])  # The goods and services to be purchased, broken into line items wherever possible. Items should not be duplicated, but a quantity of 2 specified instead.
+    items = ListType(ModelType(Item), required=True, min_size=1, validators=[validate_cpv_group, validate_items_uniq])  # The goods and services to be purchased, broken into line items wherever possible. Items should not be duplicated, but a quantity of 2 specified instead.
     value = ModelType(Value, required=True)  # The total estimated value of the procurement.
     procurementMethod = StringType(choices=['open', 'selective', 'limited'], default='open')  # Specify tendering method as per GPA definitions of Open, Selective, Limited (http://www.wto.org/english/docs_e/legal_e/rev-gpr-94_01_e.htm)
     procurementMethodRationale = StringType()  # Justification of procurement method, especially in the case of Limited tendering.

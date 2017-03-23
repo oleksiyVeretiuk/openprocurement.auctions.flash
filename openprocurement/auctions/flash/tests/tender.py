@@ -562,7 +562,7 @@ class AuctionResourceTest(BaseWebTest):
 
         data = test_auction_data["items"][0].copy()
         classification = data['classification'].copy()
-        classification["id"] = u'66113000-5'
+        classification["id"] = u'00113000-5'
         data['classification'] = classification
         test_auction_data["items"] = [test_auction_data["items"][0], data]
         response = self.app.post_json(request_path, {'data': test_auction_data}, status=422)
@@ -570,9 +570,8 @@ class AuctionResourceTest(BaseWebTest):
         self.assertEqual(response.status, '422 Unprocessable Entity')
         self.assertEqual(response.content_type, 'application/json')
         self.assertEqual(response.json['status'], 'error')
-        self.assertEqual(response.json['errors'], [
-            {u'description': [u'CAV group of items be identical'], u'location': u'body', u'name': u'items'}
-        ])
+        self.assertEqual(response.json['errors'][0]['location'], u'body')
+        self.assertEqual(response.json['errors'][0]['name'], u'items')
 
     def test_create_auction_generated(self):
         data = test_auction_data.copy()
@@ -973,7 +972,7 @@ class AuctionResourceTest(BaseWebTest):
         self.assertEqual(len(response.json['data']['items']), 1)
 
         response = self.app.patch_json('/auctions/{}'.format(auction['id']), {'data': {'items': [{"classification": {
-            "scheme": u"CAV",
+            "scheme": u"CPV",
             "id": u"70123000-9",
             "description": u"Нерухомість"
         }}]}})

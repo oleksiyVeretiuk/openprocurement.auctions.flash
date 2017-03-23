@@ -51,8 +51,8 @@ test_auction_data = {
         {
             "description": u"Земля для військовослужбовців",
             "classification": {
-                "scheme": u"CAV",
-                "id": u"70122000-2",
+                "scheme": u"CPV",
+                "id": u"19212310-1",
                 "description": u"Земля"
             },
             "additionalClassifications": [

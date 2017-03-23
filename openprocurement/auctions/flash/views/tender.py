@@ -72,8 +72,8 @@ class AuctionResource(APIResource):
                         {
                             "description": "футляри до державних нагород",
                             "primaryClassification": {
-                                "scheme": "CAV",
-                                "id": "44617100-9",
+                                "scheme": "CPV",
+                                "id": "19212310-1",
                                 "description": "Cartons"
                             },
                             "additionalClassification": [
