@@ -135,7 +135,7 @@ class Location(Model):
 class Item(Item):
     """A good, service, or work to be contracted."""
     additionalClassifications = ListType(ModelType(Classification), default=list(), validators=[validate_dkpp]) # required=True, min_size=1,
-
+    contractPeriod = ModelType(Period)
 
     def validate_relatedLot(self, data, relatedLot):
         if relatedLot and isinstance(data['__parent__'], Model) and relatedLot not in [i.id for i in get_auction(data['__parent__']).lots]:
