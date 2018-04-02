@@ -55,12 +55,12 @@ from openprocurement.api.models.auction_models.models import (
     validate_features_uniq,
     validate_items_uniq,
     validate_lots_uniq,
-    get_now,
     ComplaintModelType
 )
 
 from openprocurement.api.utils import (
-    get_request_from_root
+    get_request_from_root,
+    get_now
 )
 
 from openprocurement.auctions.core.models import (
